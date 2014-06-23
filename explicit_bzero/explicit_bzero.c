@@ -67,7 +67,9 @@ call_on_stack(void (*fn)(int), void *stack, size_t stacklen)
 
 	/* Restore the original signal action, stack, and mask. */
 	ASSERT_EQ(0, sigaction(SIGUSR1, &oldsigact, NULL));
-	ASSERT_EQ(0, sigaltstack(&oldsigstk, NULL));
+	if (oldsigstk.ss_flags & SA_ONSTACK) {
+		ASSERT_EQ(0, sigaltstack(&oldsigstk, NULL));
+	}
 	ASSERT_EQ(0, sigprocmask(SIG_SETMASK, &oldsigset, NULL));
 }
 
